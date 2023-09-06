@@ -1,24 +1,69 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import Camera, { PropertyBag } from "@onecamera/core";
+import "@onecamera/core/build/style.css";
+import { useState } from "react";
 
 function App() {
+  const stagesConfig = {
+    states: {
+      playback: {
+        on: {
+          NEXT: 'processing',
+        },
+      },
+    }
+  }
+
+  const [recording, setRecording] = useState(false);
+
+  function startRecording() {
+    setRecording(true);
+  }
+
+  function onComplete() {
+    setRecording(false);
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {recording ? (
+        <div class="App-header">
+          <div style={{height:'600px', width: '-webkit-fill-available'}}>
+            <Camera
+              enableBasicCamera={true}
+              maxRecordDuration={600}
+              allowDownloads
+              effects={{
+                text: true,
+                ink: true,
+                photo: true,
+                teleprompter: true,
+              }}
+              thumbnailConfiguration={{
+                isProcessingPreviewEnabled: false,
+                aspectRatio: "16x9",
+              }}
+              preferredControlsConfiguration={{
+                globalControls: [
+                  "sticky_notes",
+                  "mirror_video",
+                  "mute",
+                  "screen_share",
+                ],
+              }}
+              cameraCallbacks={{
+                onComplete: onComplete,
+              }}
+              stages={stagesConfig}
+            />
+          </div>
+        </div>
+      ) : (
+        <div class="App-header">
+          <button onClick={startRecording}>Start Recording</button>
+        </div>
+      )}
+    </>
   );
 }
 
